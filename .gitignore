@@ -1,2 +1,3 @@
 *.db
 sbatch-*
+/__pycache__/
