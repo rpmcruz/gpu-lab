@@ -1,0 +1,20 @@
+#!/usr/bin/python3
+
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('cmd', nargs='+')
+args = parser.parse_args()
+
+import os, subprocess, sys
+import random
+import db
+
+gpus = db.get_gpus_available()
+if gpus:
+    gpu = random.choice(list(gpus))
+    print(f'Using GPU {gpu}')
+    p = subprocess.Popen(args.cmd, stdout=sys.stdout, stderr=sys.stderr)
+    db.add(os.getlogin(), args.cmd, 0, gpu, p.pid)
+    os.wait()
+else:
+    print('No GPU is available at this moment.')

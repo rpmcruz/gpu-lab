@@ -1,0 +1,6 @@
+#!/usr/bin/python3
+
+import db
+
+for id, pid, gpu, cmd in db.get_ids_pids_gpus_cmds_running():
+    print(f'ID={id} PID={pid} GPU={gpu} CMD={cmd}')

@@ -1,0 +1,24 @@
+#!/usr/bin/python3
+
+import time, psutil, subprocess
+import db
+
+def still_running(pid):
+    return psutil.pid_exists(pid)
+
+while True:
+    # remove gpu from those no longer running
+    for id, pid, _, _ in db.get_ids_pids_gpus_cmds_running():
+        if not still_running(pid):
+            db.remove(id)
+            # email person
+
+    # run any job in the queue
+    gpus = db.get_gpus_available()
+    for gpu, (id, cmd) in zip(gpus, db.get_ids_cmds_queue()):
+        with open(f'sbatch-{id}-{"-".join(cmd)}.txt', 'w') as f:
+            p = subprocess.Popen(cmd, stdout=f, stderr=subprocess.STDOUT)
+            db.assign_gpu_pid(id, gpu, p.pid)
+
+    # sleep
+    time.sleep(5)
